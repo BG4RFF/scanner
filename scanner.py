@@ -115,11 +115,12 @@ def mesurer(d,f,p):
     plt.pause(0.001)
     plt.show(block=False)
     if sortie:
+        measurements = ''
+        measurements += 'frequency,VSWR\nMHz,-\n'
+        for i in range(len(F)): measurements += (str(F[i])+','+ str(SWR[i])+'\n')
+        measurements+=('\n\n')
         fo = open(fichier, 'a')
-        fo.write('frequency,VSWR\nMHz,-\n')
-        for i in range(len(F)):
-            fo.write(str(F[i])+','+ str(SWR[i])+'\n')
-        fo.write('\n\n')
+        fo.write(measurements)
         fo.close()
 
 def interroge():
@@ -183,6 +184,7 @@ def scanner():
         elif ORDRE == 'Q':
             BOUCLE = False
         else:
+            print ('There is no action defined for '+ ORDRE + ' !')
             aide()
 
 if __name__ == '__main__': scanner()
