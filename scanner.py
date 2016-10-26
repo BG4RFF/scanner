@@ -36,12 +36,20 @@ def getnum (chaine):
     a = [0.0] * 5
     for car in chaine:
         if car == ',':
-            a [i] = float(numchain)
+            try:
+                a [i] = float(numchain)
+            except ValueError:
+                if bavard : print('The string '+numchain+' is not a float!')
+                a [i] = 0.0
             i = i+1
             numchain = ''
         else:
             numchain = numchain + car
-    a [i] = float(numchain)
+    try:
+        a [i] = float(numchain)
+    except ValueError:
+        if bavard : print('The string '+numchain+' is not a float!')
+        a [i] = 0.0
     return a
 
 def debut():
@@ -123,6 +131,17 @@ def mesurer(d,f,p):
         fo.write(measurements)
         fo.close()
 
+def contwave(d):
+    if bavard:
+        print('On va generer un signal continu de '+str(0.000001*d)+' MHz')
+    ser.write (str(d)+'C')
+
+def takenap():
+    if bavard:
+        print('On fait une pause pour economiser le courant')
+    ser.write ('X')
+
+
 def interroge():
     i=0
     param = [0.0] * 3
@@ -134,13 +153,25 @@ def interroge():
         i = i+1
         if ligne.startswith('Start Freq:'):
             ligne = ligne.replace('Start Freq:','')
-            param [0] = float(ligne)
+            try:
+                param [0] = float(ligne)
+            except ValueError:
+                if bavard : print('The string '+ligne+' is not a float for Start Freq!')
+                param [0] = 0.0
         elif ligne.startswith('Stop Freq:'):
             ligne = ligne.replace('Stop Freq:','')
-            param [1] = float(ligne)
+            try:
+                param [1] = float(ligne)
+            except ValueError:
+                if bavard : print('The string '+ligne+' is not a float for Stop Freq!')
+                param [1] = 0.0
         elif ligne.startswith('Num Steps:'):
             ligne = ligne.replace('Num Steps:','')
-            param [2] = float(ligne)
+            try:
+                param [2] = float(ligne)
+            except ValueError:
+                if bavard : print('The string '+ligne+' is not a float for Num Steps!')
+                param [2] = 0.0
     return param
 
 def aide():
@@ -148,6 +179,8 @@ def aide():
     print('E = end frequency in MHz')
     print('N = number of measurement points')
     print('S = perform scan')
+    print('C = CW signal at start frequency')
+    print('X = put the scanner in sleep mode')
     print('? = interrogate the scanner')
     print('H = help')
     print('Q = quit')
@@ -174,6 +207,10 @@ def scanner():
             POINTS = points()
         elif ORDRE == 'S':
             mesurer(STARTFREQ, STOPFREQ, POINTS)
+        elif ORDRE == 'C':
+            contwave(STARTFREQ)
+        elif ORDRE == 'X':
+            takenap()
         elif ORDRE == '?':
             PARAM = interroge()
             STARTFREQ = int(PARAM [0])
